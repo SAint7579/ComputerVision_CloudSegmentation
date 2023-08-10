@@ -76,7 +76,7 @@ def convert_image_array_to_slic_with_properties(image_array, binary_array, n_seg
     return segmented_image_rgb, properties, labels
 
 
-def get_patche(path_to_folders_images = "Natural_False_Color/", path_to_folders_labels = "Entire_scene_gts/"):
+def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_labels = "Entire_scene_gts/"):
     # For images
     true_dataset = []
     tif_files = glob.glob(path_to_folders_images + "*.TIF")
