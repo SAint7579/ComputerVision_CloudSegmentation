@@ -76,7 +76,7 @@ def convert_image_array_to_slic_with_properties(image_array, binary_array, n_seg
             segmented_binary_array[mask]=mean_color_binary_array
 
     properties = np.array(properties)  # Convert properties list to numpy array
-    return segmented_image_rgb, properties, labels, segmented_binary_array,segments
+    return segmented_image_rgb, properties, labels, segmented_binary_array, segments
 
 
 def reverse_segmentation(slic_object,labels):
