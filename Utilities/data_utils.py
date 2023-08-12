@@ -89,6 +89,7 @@ def reverse_segmentation(slic_object,labels):
     return segmented_binary_array
 
 
+
 def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_labels = "Entire_scene_gts/"):
     # For images
     true_dataset = []
