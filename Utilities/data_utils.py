@@ -23,7 +23,6 @@ def calculate_black_pixel_percentage(image_array):
     percentage = (black_pixels / total_pixels) * 100
     return percentage
 
-
 def convert_image_array_to_slic_with_properties(image_array, binary_array, n_segments=100, compactness=10, sigma=1):
     """
     Convert an image array to a segmented RGB image using SLIC (Simple Linear Iterative Clustering) algorithm,
@@ -43,37 +42,51 @@ def convert_image_array_to_slic_with_properties(image_array, binary_array, n_seg
     """
     segments = slic(image_array, n_segments=n_segments, compactness=compactness, sigma=sigma)
     segmented_image_rgb = np.zeros_like(image_array)
+    segmented_binary_array=np.zeros_like(binary_array)
     properties = []  # List to store properties
-
+    labels=[]
+    
     for segment_id in np.unique(segments):
         mask = segments == segment_id
         segment_rgb = image_array[mask]
 
+        segmented_pixels = binary_array[mask]
+        
+        
         if np.any(mask):
             num_pixels = np.sum(mask)
             centroid = center_of_mass(mask)
             centroid_x, centroid_y = centroid
             mean_color = np.mean(segment_rgb, axis=0)
+            
+            mean_color_binary_array=np.bincount(segmented_pixels).argmax()
+            
 
             properties.append({
+                'superpixel_num' : segment_id,
                 'color': mean_color,  # RGB color values
                 'centroid_x': centroid_x,  # x coordinate of centroid
                 'centroid_y': centroid_y,  # y coordinate of centroid
-                'num_pixels': num_pixels  # number of pixels in superpixel
+                'num_pixels': num_pixels, # number of pixels in superpixel
+                'label' : mean_color_binary_array
             })
+            labels.append(mean_color_binary_array)
 
             segmented_image_rgb[mask] = mean_color
+            segmented_binary_array[mask]=mean_color_binary_array
 
     properties = np.array(properties)  # Convert properties list to numpy array
+    return segmented_image_rgb, properties, labels, segmented_binary_array,segments
 
-    labels = []
-    for prop in properties:
-        x, y = int(prop['centroid_x']), int(prop['centroid_y'])
-        binary_color = binary_array[y, x]  # Assuming binary_array has the same dimensions as the image
-        label = 1 if binary_color == 0 else 0
-        labels.append(label)
-    # properties.append(labels)
-    return segmented_image_rgb, properties, labels
+
+def reverse_segmentation(slic_object,labels):
+    segmented_binary_array=np.zeros((512,512))
+    for segment_id in np.unique(slic_object):
+        mask = slic_object == segment_id
+        if np.any(mask):
+            segmented_binary_array[mask]=labels[segment_id-1]
+        
+    return segmented_binary_array
 
 
 def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_labels = "Entire_scene_gts/"):
