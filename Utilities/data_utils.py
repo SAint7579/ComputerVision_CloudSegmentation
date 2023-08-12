@@ -79,6 +79,7 @@ def convert_image_array_to_slic_with_properties(image_array, binary_array, n_seg
 def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_labels = "Entire_scene_gts/"):
     # For images
     true_dataset = []
+
     tif_files = glob.glob(path_to_folders_images + "*.TIF")
 
     # Iterate through the .tif files and read them using rasterio
@@ -94,6 +95,7 @@ def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_l
 
     # For labels
     label_dataset = []
+
     tif_files = glob.glob(path_to_folders_labels + "*.TIF")
 
     # Iterate through the .tif files and read them using rasterio
@@ -102,7 +104,9 @@ def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_l
         label = temp.read(1)
         temp.close()
         label_dataset.append(label)
-         
+        
+            
+            
     # making patches
     patch_size = 512
     num_rows = 16
@@ -118,13 +122,19 @@ def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_l
                 end_row = start_row + patch_size
                 start_col = col * patch_size
                 end_col = start_col + patch_size
-                
                 patch = true_dataset[i][start_row:end_row, start_col:end_col]
+                if any(dim == 0 for dim in patch.shape):
+                    continue
+                patch = cv2.resize(patch, (512, 512))
                 label_patch = label_dataset[i][start_row:end_row, start_col:end_col]
-                if calculate_black_pixel_percentage(patch) > 0.95 :
+                label_patch = cv2.resize(label_patch, (512, 512))
+                if calculate_black_pixel_percentage(patch) > 1  or calculate_black_pixel_percentage(label_patch) > 98 or np.sum(label_patch)==262144:
                     continue
                 true_patches.append(patch)
                 label_patches.append(label_patch)
 
+    true_patches = np.array(true_patches)
+    label_patches = np.array(label_patches)
 
     return true_patches, label_patches
+
