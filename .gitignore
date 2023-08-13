@@ -1,5 +1,5 @@
 Dataset/
 Superpixel-UNET/lightning_logs
-Superpixel-UNET/model_checkpt
+Superpixel-UNET/*model_checkpt
 Natural_False_Color/
 Entire_scene_gts/
