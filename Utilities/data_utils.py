@@ -14,7 +14,8 @@ from sklearn.decomposition import PCA
 # mds = MDS(n_components=1, random_state=0, normalized_stress='auto')
 pca = PCA(n_components=1)
 
-def convert_to_xy(image,patch,n_segments=500):
+
+def convert_to_xy(image,patch,n_segments=300):
     agg, segments = fast_image_to_slic(image, patch, n_segments=n_segments, compactness=10)
 
     ## Getting the X and y arrays
