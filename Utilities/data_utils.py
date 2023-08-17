@@ -10,10 +10,12 @@ import pandas as pd
 
 ## For MDS
 from sklearn.manifold import MDS
-mds = MDS(n_components=1, random_state=0, normalized_stress='auto')
+from sklearn.decomposition import PCA
+# mds = MDS(n_components=1, random_state=0, normalized_stress='auto')
+pca = PCA(n_components=1)
 
-def convert_to_xy(image,patch):
-    agg, segments = fast_image_to_slic(image, patch, n_segments=300, compactness=10)
+def convert_to_xy(image,patch,n_segments=500):
+    agg, segments = fast_image_to_slic(image, patch, n_segments=n_segments, compactness=10)
 
     ## Getting the X and y arrays
     X_array = agg[['R', 'G', 'B', 'x', 'y', 'num_pixels']].values
@@ -28,14 +30,14 @@ def convert_to_xy(image,patch):
     X_array[:,5] = X_array[:,5]/1000
 
     ## Ordering
-    ordering = mds.fit_transform(X_array[:,3:5]).reshape(-1)
+    ordering = pca.fit_transform(X_array[:,3:5]).reshape(-1)
     X_array = X_array[ordering.argsort()]
     y_array = y_array[ordering.argsort()]
 
 
     ## Pad the X_array with -1 and y_array with 0 upto 300
-    X_array = np.pad(X_array,((0,300-X_array.shape[0]),(0,0)),mode='constant',constant_values=-1)
-    y_array = np.pad(y_array,(0,300-y_array.shape[0]),mode='constant',constant_values=0).reshape(-1,1)
+    X_array = np.pad(X_array,((0,n_segments-X_array.shape[0]),(0,0)),mode='constant',constant_values=-1)
+    y_array = np.pad(y_array,(0,n_segments-y_array.shape[0]),mode='constant',constant_values=0).reshape(-1,1)
 
     return X_array, y_array, ordering.argsort(), segments
 
