@@ -16,6 +16,20 @@ pca = PCA(n_components=1)
 
 
 def convert_to_xy(image,patch,n_segments=300):
+    """
+    Convert an image array and the patch to X and y arrays for training and testing.
+
+    Args:
+        image (numpy.ndarray): Input RGB image array.
+        patch (numpy.ndarray): Input binary patch array.
+        n_segments (int, optional): Number of segments in SLIC. Default is 300.
+
+    Returns:
+        X_array (numpy.ndarray): Input X array.
+        y_array (numpy.ndarray): Input y array.
+        ordering (numpy.ndarray): Ordering of the superpixels.
+        segments (numpy.ndarray): SLIC map of the image.
+    """
     agg, segments = fast_image_to_slic(image, patch, n_segments=n_segments, compactness=10)
 
     ## Getting the X and y arrays
@@ -56,8 +70,10 @@ def unpad_and_map(X,y,original_ordering,slic_map):
     Returns:
         map (numpy.ndarray): Segmentation map of the image with the original ordering.
     '''
+    ## Removing the padding
     label = y[[X[:,0] != -1]]
     label = label[original_ordering.argsort()]
+    ## Converting 1D map to 2D map
     map = reverse_segmentation(slic_map,label)
     return map
 
@@ -134,6 +150,17 @@ def reverse_segmentation(slic_object,labels):
 
 
 def get_patch(path_to_folders_images = "Natural_False_Color/", path_to_folders_labels = "Entire_scene_gts/"):
+    """
+    Fetches the patches from the images and labels.
+
+    Args:
+        path_to_folders_images (str, optional): Path to the folder containing the images. Default is "Natural_False_Color/".
+        path_to_folders_labels (str, optional): Path to the folder containing the labels. Default is "Entire_scene_gts/".
+
+    Returns:
+        true_patches (numpy.ndarray): Array of true patches.
+        label_patches (numpy.ndarray): Array of label patches.
+    """
     # For images
     true_dataset = []
 
