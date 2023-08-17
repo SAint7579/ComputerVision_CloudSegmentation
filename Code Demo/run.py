@@ -168,6 +168,18 @@ def make_prediction(image, model):
     return y_pred
 
 
+## Write a function to calculate the dice score between two images
+def get_jaccard_score(y_true, y_pred):
+    intersection = np.logical_and(y_true, y_pred)
+    union = np.logical_or(y_true, y_pred)
+    jaccard = np.sum(intersection) / np.sum(union)
+    return jaccard
+
+def get_dice_score(y_true, y_pred):
+    intersection = np.logical_and(y_true, y_pred)
+    dice = 2 * np.sum(intersection) / (np.sum(y_true) + np.sum(y_pred))
+    return dice
+
 if __name__ == '__main__':
     ## Loading the Model
     segmentationModel = CloudSegmentationModel(depth=2)
@@ -179,8 +191,13 @@ if __name__ == '__main__':
     for i,j in zip(mask,patches):
         y_pred = make_prediction(j, segmentationModel)
 
+        ## Calculating the dice score and jaccard score
+        dice_score = get_dice_score(i, y_pred)
+        jaccard_score = get_jaccard_score(i, y_pred)
+
         ## Plotting the prediction alongside the original image and mask
         fig, ax = plt.subplots(1,3, figsize=(15,5))
+        plt.suptitle(f'Dice Score: {dice_score:.2f}, Jaccard Score: {jaccard_score:.2f}')
         ax[0].imshow(j)
         ax[0].set_title('Original Image')
         ax[1].imshow(i)
@@ -188,5 +205,7 @@ if __name__ == '__main__':
         ax[2].imshow(y_pred)
         ax[2].set_title('Prediction')
         plt.show()
+
+
 
     
