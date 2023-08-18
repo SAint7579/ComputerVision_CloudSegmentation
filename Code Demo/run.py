@@ -11,7 +11,6 @@ import sys
 sys.path.append('../Utilities/')
 
 import data_utils
-## Import MDS from sklearn
 from sklearn.metrics import accuracy_score
 
 class SqueezeExciteBlock(nn.Module):
